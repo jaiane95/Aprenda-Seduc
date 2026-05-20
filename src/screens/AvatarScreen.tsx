@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, Star, ShoppingBag, Check } from 'lucide-react';
@@ -19,13 +19,23 @@ const AVATAR_SEEDS = ['Leo', 'Felix', 'Ben', 'Oliver', 'Max', 'Sam', 'Tico', 'Mi
 
 export default function AvatarScreen() {
   const navigate = useNavigate();
-  const { user, coins, unlockItem, setAvatar } = useAppStore();
+  const { user, coins, unlockItem, setAvatar, setAvatarName } = useAppStore();
   const unlockedItems = user?.unlockedItems || [];
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState('');
 
   const handleBuy = (item: typeof SHOP_ITEMS[0]) => {
     if (coins >= item.cost && !unlockedItems.includes(item.id)) {
       unlockItem(item.id, item.cost);
     }
+  };
+
+  const handleSaveBonecoName = () => {
+    if (tempName.trim()) {
+      setAvatarName(tempName.trim());
+    }
+    setIsEditingName(false);
   };
 
   const getAvatarUrl = (seed: string) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
@@ -79,7 +89,44 @@ export default function AvatarScreen() {
                )}
             </motion.div>
             <h2 className="text-3xl font-black text-art-navy tracking-tight">{user?.name}</h2>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Nível 2 • Pequeno Aventureiro</p>
+            
+            {/* Custom Boneco Name */}
+            <div className="mt-3 flex flex-col items-center bg-slate-50 border border-slate-100 rounded-[20px] px-4 py-2 shadow-inner">
+              <span className="text-slate-400 font-black uppercase tracking-widest text-[9px]">Nome do meu Boneco 🧸</span>
+              <div className="flex items-center space-x-2 mt-1">
+                {isEditingName ? (
+                  <div className="flex items-center space-x-1">
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      maxLength={15}
+                      className="border-2 border-art-coral bg-white rounded-lg px-2 py-0.5 text-xs font-black text-art-navy focus:outline-none w-28 text-center"
+                      placeholder="Ex: Tico"
+                      autoFocus
+                    />
+                    <button onClick={handleSaveBonecoName} className="p-1.5 bg-art-teal border border-art-sage-border text-art-navy rounded-lg font-black text-xs art-btn-press shrink-0">
+                      <Check size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1.5">
+                    <span className="text-sm font-extrabold text-art-purple-dark bg-white px-2.5 py-0.5 rounded-full border border-slate-100 shadow-sm">
+                      {user?.avatarName || 'Sem Nome'}
+                    </span>
+                    <button 
+                      onClick={() => { setTempName(user?.avatarName || ''); setIsEditingName(true); }} 
+                      className="p-1.5 bg-white hover:bg-slate-100 rounded-lg border border-slate-100 text-slate-400 hover:text-art-navy transition art-btn-press" 
+                      title="Editar nome"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-4">Nível 2 • Pequeno Aventureiro</p>
         </div>
 
         {/* Change Avatar Pick */}

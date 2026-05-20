@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { db } from '../services/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export interface User {
   uid: string;
@@ -12,6 +14,7 @@ export interface User {
   mood?: string;
   completedActivities: string[];
   pin?: string;
+  avatarName?: string;
 }
 
 export interface RoutineItem {
@@ -62,6 +65,7 @@ interface AppState {
   deleteTurma: (turmaId: string) => void;
   setMood: (mood: string) => void;
   completeActivity: (activityId: string) => void;
+  setAvatarName: (name: string) => void;
 }
 
 const today = new Date().toISOString().split('T')[0];
@@ -81,6 +85,15 @@ const DEFAULT_ACTIVITIES: Record<string, ActivityItem[]> = {
   ]
 };
 
+async function updateFirestoreUser(userId: string, data: Partial<User>) {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, data);
+  } catch (error) {
+    console.error('Error updating firestore user:', error);
+  }
+}
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
@@ -89,25 +102,54 @@ export const useAppStore = create<AppState>()(
       routines: [],
       setRoutines: (routines) => set({ routines }),
       coins: 0,
-      addCoins: (amount) => set((state) => ({ 
-        coins: state.coins + amount,
-        user: state.user ? { ...state.user, coins: (state.user.coins || 0) + amount } : null
-      })),
-      unlockItem: (itemId, cost) => set((state) => {
-        if (!state.user || state.coins < cost) return state;
-        const newUnlocked = [...(state.user.unlockedItems || []), itemId];
+      addCoins: (amount) => set((state) => {
+        if (!state.user) return {};
+        const newCoins = state.coins + amount;
+        const updatedUser = { ...state.user, coins: newCoins };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+        
+        updateFirestoreUser(state.user.uid, { coins: newCoins });
+        
         return {
-          coins: state.coins - cost,
-          user: {
-            ...state.user,
-            unlockedItems: newUnlocked,
-            coins: state.coins - cost
-          }
+          coins: newCoins,
+          user: updatedUser,
+          users: updatedUsers
         };
       }),
-      setAvatar: (avatar) => set((state) => ({
-        user: state.user ? { ...state.user, avatar } : null
-      })),
+      unlockItem: (itemId, cost) => set((state) => {
+        if (!state.user || state.coins < cost) return {};
+        const newCoins = state.coins - cost;
+        const newUnlocked = [...(state.user.unlockedItems || []), itemId];
+        const updatedUser = {
+          ...state.user,
+          unlockedItems: newUnlocked,
+          coins: newCoins
+        };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+
+        updateFirestoreUser(state.user.uid, {
+          unlockedItems: newUnlocked,
+          coins: newCoins
+        });
+
+        return {
+          coins: newCoins,
+          user: updatedUser,
+          users: updatedUsers
+        };
+      }),
+      setAvatar: (avatar) => set((state) => {
+        if (!state.user) return {};
+        const updatedUser = { ...state.user, avatar };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+
+        updateFirestoreUser(state.user.uid, { avatar });
+
+        return {
+          user: updatedUser,
+          users: updatedUsers
+        };
+      }),
       turmas: [
         { id: 'turma-1', name: '1º Ano A', activities: DEFAULT_ACTIVITIES }
       ],
@@ -151,12 +193,48 @@ export const useAppStore = create<AppState>()(
       deleteTurma: (turmaId) => set((state) => ({
         turmas: state.turmas.filter(t => t.id !== turmaId)
       })),
-      setMood: (mood) => set((state) => ({
-        user: state.user ? { ...state.user, mood } : null
-      })),
-      completeActivity: (activityId) => set((state) => ({
-        user: state.user ? { ...state.user, completedActivities: [...(state.user.completedActivities || []), activityId] } : null
-      })),
+      setMood: (mood) => set((state) => {
+        if (!state.user) return {};
+        const updatedUser = { ...state.user, mood };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+
+        updateFirestoreUser(state.user.uid, { mood });
+
+        return {
+          user: updatedUser,
+          users: updatedUsers
+        };
+      }),
+      completeActivity: (activityId) => set((state) => {
+        if (!state.user) return {};
+        const newCompleted = [...(state.user.completedActivities || []), activityId];
+        const updatedUser = {
+          ...state.user,
+          completedActivities: newCompleted
+        };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+
+        updateFirestoreUser(state.user.uid, {
+          completedActivities: newCompleted
+        });
+
+        return {
+          user: updatedUser,
+          users: updatedUsers
+        };
+      }),
+      setAvatarName: (avatarName) => set((state) => {
+        if (!state.user) return {};
+        const updatedUser = { ...state.user, avatarName };
+        const updatedUsers = state.users.map(u => u.uid === state.user?.uid ? updatedUser : u);
+
+        updateFirestoreUser(state.user.uid, { avatarName });
+
+        return {
+          user: updatedUser,
+          users: updatedUsers
+        };
+      }),
     }),
     {
       name: 'aprendaplus-storage-v2',
