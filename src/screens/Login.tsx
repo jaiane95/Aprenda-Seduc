@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { motion } from 'motion/react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, User } from 'lucide-react';
 import { db, bootstrapFirebaseIfNeeded, handleFirestoreError, OperationType } from '../services/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -96,7 +96,7 @@ export default function Login() {
           {role === 'student' && selectedStudent ? (
              <img src={selectedStudent.avatar} alt="Avatar" className="w-20 h-20 object-contain" />
           ) : role === 'student' ? (
-             <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Leo" alt="Avatar-Default" className="w-20 h-20 object-contain" />
+             <User className="w-14 h-14 text-art-rose-dark opacity-80" />
           ) : (
             <ShieldCheck className="w-14 h-14 text-art-navy" />
           )}
