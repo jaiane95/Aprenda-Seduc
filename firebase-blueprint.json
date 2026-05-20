@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Details for student or professor profile.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "professor"] },
+        "avatar": { "type": "string" },
+        "pin": { "type": "string" },
+        "coins": { "type": "number" },
+        "unlockedItems": { "type": "array" }
+      },
+      "required": ["uid", "name", "role"]
+    },
+    "Routine": {
+      "title": "Daily Routine Item",
+      "description": "A scheduled activity for a child's day.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "time": { "type": "string" },
+        "activity": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["userId", "time", "activity", "completed", "date"]
+    },
+    "Activity": {
+      "title": "Pedagogical Activity",
+      "description": "Educational content for Portuguese, Math or Emotions.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["portuguese", "math", "emotions"] },
+        "question": { "type": "string" },
+        "options": { "type": "array" },
+        "correctAnswer": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["type", "question", "options", "correctAnswer"]
+    },
+    "Alert": {
+      "title": "Security/Help Alert",
+      "description": "Real-time help requests from children.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "type": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "timestamp"]
+    },
+    "Progress": {
+      "title": "Student Progress",
+      "description": "Tracks completed activities and scores.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "activityId": { "type": "string" },
+        "type": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "activityId", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Root collection for users."
+    },
+    "/users/{userId}/routines/{routineId}": {
+      "schema": "Routine",
+      "description": "Child's personalized routine."
+    },
+    "/activities/{activityId}": {
+      "schema": "Activity",
+      "description": "Available educational activities."
+    },
+    "/alerts/{alertId}": {
+      "schema": "Alert",
+      "description": "Global alerts for professor monitoring."
+    },
+    "/users/{userId}/progress/{progressId}": {
+      "schema": "Progress",
+      "description": "Logs of child activity completion."
+    }
+  }
+}

@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Artistic Flair Palette */
+  --color-art-bg: #FDFCF8;
+  --color-art-slate: #334155;
+  --color-art-purple-dark: #4A4E69;
+  --color-art-coral: #FFB5A7;
+  --color-art-teal: #A8DADC;
+  --color-art-navy: #1D3557;
+  --color-art-border: #F0EFEB;
+  
+  /* Card 1: Routine (Lime) */
+  --color-art-lime: #E9EDC9;
+  --color-art-lime-dark: #283618;
+  --color-art-lime-border: #CCD5AE;
+  
+  /* Card 2: Learn (Sage) */
+  --color-art-sage: #D8E2DC;
+  --color-art-sage-dark: #457B9D;
+  --color-art-sage-border: #C1D3C8;
+  
+  /* Card 3: Help (Peach) */
+  --color-art-peach: #FFE5D9;
+  --color-art-peach-dark: #843B3B;
+  --color-art-peach-border: #FDB4BF;
+  
+  /* Card 4: Avatar (Rose) */
+  --color-art-rose: #FAE1DD;
+  --color-art-rose-dark: #6D597A;
+  --color-art-rose-border: #FBC4AB;
+
+  --color-art-yellow: #FFD166;
+}
+
+@layer base {
+  body {
+    @apply bg-[#F1F3F5] text-art-slate antialiased overflow-x-hidden;
+  }
+}
+
+.art-card-shadow {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.art-btn-press {
+  @apply transition-all active:translate-y-1 active:border-b-0;
+}
+
