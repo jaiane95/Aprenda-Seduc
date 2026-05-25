@@ -29,6 +29,7 @@ O objetivo estrutural da aplicação é servir como um aplicativo de acesso móv
 
 ---
 
+
 ## 🛠️ Tecnologias Base do Projeto
 
 A stack do **APRENDA+** foi selecionada visando reatividade rápida, segurança de dados em tempo real e fluidez na execução das animações pedagógicas.
