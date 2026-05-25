@@ -35,7 +35,7 @@ A stack do **APRENDA+** foi selecionada visando reatividade rápida, segurança 
 
 ### 💻 Frontend (Interface)
 *   **React + TypeScript (Vite):** Utiliza componentes funcionais estruturados e estritamente tipados para evitar erros em execução e proporcionar alta velocidade de carregamento.
-*   **Tailwind CSS:** Toda a interface utiliza as classes utilitárias do Tailwind para construir o tema customizado **Aesthetic Art** (com tons amigáveis de azul marinho, pêssego/coral, sálvia e roxo escuro, reduzindo fadiga cognitiva e estresse sensorial).
+*   **Tailwind CSS:** Toda a interface utiliza as classes utilitárias do Tailwind para construir o tema customizado com tons amigáveis, reduzindo fadiga cognitiva e estresse sensorial.
 *   **motion (Framer Motion):** Aplicado no fluxo de transição de telas, interações com a rotina e conquistas de moedas, tornando o aplicativo vivo e recompensador.
 *   **Lucide React:** Uma coleção coesa de ícones lineares de fácil reconhecimento visual.
 
