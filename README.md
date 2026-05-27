@@ -4,7 +4,7 @@ O **APRENDA+** é um aplicativo escolar feito para ajudar no aprendizado de cria
 
 ---
 
-## 💡 A Proposta
+##  A Proposta
 
 O principal objetivo é criar um espaço na internet simples e acolhedor para todo mundo na escola:
 * **Para Alunos:** Menos ansiedade com uma agenda visual bem simples e tarefas coloridas que dão moedas virtuais. Com essas moedas, você pode comprar itens e roupinhas na loja para o seu próprio bonequinho (avatar)!
