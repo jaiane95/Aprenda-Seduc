@@ -1,15 +1,15 @@
 # APRENDA+ — Educação Inclusiva & Gamificada 🌟
 
-O **APRENDA+** é um protótipo interativo e funcional de uma aplicação educacional de suporte à inclusão, especialmente projetada para crianças com **Transtorno do Espectro Autista (TEA)** e **Transtorno do Déficit de Atenção com Hiperatividade (TDAH)**. A ferramenta une previsibilidade de rotina com o reforço positivo da gamificação para incentivar a autonomia e o aprendizado lúdico.
+O **APRENDA+** é uma aplicação educacional de suporte à inclusão, especialmente projetada para crianças com **Transtorno do Espectro Autista (TEA)** e **Transtorno do Déficit de Atenção com Hiperatividade (TDAH)**. A ferramenta une a previsibilidade de uma rotina estruturada com o reforço positivo da gamificação para incentivar a autonomia e o aprendizado de forma lúdica.
 
 ---
 
-## 💡 A Proposta e o Escopo de Protótipo
+## 💡 A Proposta
 
-> ⚠️ **Aviso de Protótipo e Apresentador**:  
-> Este projeto foi desenvolvido como um **protótipo de apresentação** e validador de conceito (MVP). Embora possua fluxos e telas 100% funcionais (incluindo persistência inteligente e conexões com Firestore), ele representa a **fundação de design de experiência e arquitetura base**, pronto para ser expandido e portado para um aplicativo mobile nativo ou empacotado como PWA (Progressive Web App).
-
-O objetivo estrutural da aplicação é servir como um aplicativo de acesso móvel focado em acessibilidade e facilidade de toque, preparado para funcionar com **recursos offline funcionais** (através de cache e sincronização local) e efetuar a sincronização de progresso e tarefas na nuvem assim que uma conexão de rede for restabelecida.
+O principal objetivo do projeto é oferecer um ambiente digital acessível e acolhedor que facilite o dia a dia pedagógico:
+* **Para Alunos:** Redução da ansiedade através de uma agenda visual clara e incentivo ao estudo por meio de atividades gamificadas que rendem recompensas virtuais (moedas para personalizar o próprio avatar).
+* **Para Professores:** Acompanhamento do progresso em tempo real, controle de questionários e visualização de alertas e relatórios de desempenho detalhados.
+* **Para Gestores:** Gestão do corpo docente, definição de acessos e monitoramento geral das turmas e disciplinas da escola.
 
 ---
 
@@ -26,6 +26,11 @@ O objetivo estrutural da aplicação é servir como um aplicativo de acesso móv
 *   **Gerenciamento de Alunos:** Criação, edição de dados e exclusão de contas de estudantes com geração de PIN de segurança numérico exclusivo de 4 dígitos.
 *   **Gerenciamento de Classes e Conteúdos:** Criação e customização de atividades curriculares.
 *   **Central de Alertas em Tempo Real:** Monitor de notificações para ver os chamados de socorro ou dúvidas emitidos pelos alunos em sala.
+*   **Relatórios de Desempenho e Logs:** Painel de progresso detalhado por aluno (taxa de acerto global, acertos por disciplina, histórico de compras de avatares e linha do tempo de humor diário).
+
+### 3. Painel do Gestor (Administração Escolar)
+*   **Gerenciamento do Corpo Docente:** Cadastro de professores com definição de nome e PIN de segurança de 4 dígitos personalizados.
+*   **Supervisão de Turmas e Disciplinas:** Visualização dinâmica dos alunos e disciplinas sob a coordenação de cada professor cadastrado.
 
 ---
 
