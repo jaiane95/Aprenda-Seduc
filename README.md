@@ -63,15 +63,25 @@ Antes de começar, você precisa ter instalado em seu computador:
 * [Node.js](https://nodejs.org) (programa necessário para rodar o aplicativo).
 
 ### Passo a Passo para Rodar
-1. Abra o terminal na pasta do projeto e instale os pacotes necessários digitando:
+1. Abra o terminal e clone o repositório:
+   ```bash
+   git clone https://github.com/jaiane95/Aprenda-Seduc.git
+   ```
+
+2. Entre na pasta do projeto:
+   ```bash
+   cd Aprenda-Seduc
+   ```
+
+3. Instale os pacotes necessários digitando:
    ```bash
    npm install
    ```
 
-2. Inicie o aplicativo com o comando:
+4. Inicie o aplicativo com o comando:
    ```bash
    npm run dev
    ```
 
-3. Abra o seu navegador de internet e entre no link padrão:
-   * [http://localhost:3000](http://localhost:3000)
+5. Abra o seu navegador de internet e entre no link padrão:
+   * [http://localhost:3000](http://localhost:3000) (ou o link exibido no terminal)
