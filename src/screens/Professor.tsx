@@ -48,6 +48,20 @@ export default function Professor() {
     return () => unsubscribe();
   }, []);
 
+  const handleClearAllAlerts = async () => {
+    if (alerts.length === 0) return;
+    if (!window.confirm(`Deseja apagar todos os ${alerts.length} alerta(s)? Esta ação não pode ser desfeita.`)) return;
+    try {
+      const batch = writeBatch(db);
+      alerts.forEach(alert => {
+        batch.delete(doc(db, 'alerts', alert.id));
+      });
+      await batch.commit();
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, 'alerts');
+    }
+  };
+
   const [moodLogs, setMoodLogs] = useState<any[]>([]);
   const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [purchaseLogs, setPurchaseLogs] = useState<any[]>([]);
@@ -407,6 +421,26 @@ export default function Professor() {
       <div className="flex-1 p-6 overflow-y-auto space-y-6">
         {activeTab === 'alerts' && (
           <div className="space-y-6">
+            {/* Header com botão de limpar */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-art-navy">Central de Alertas</h2>
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">
+                  {alerts.length} alerta{alerts.length !== 1 ? 's' : ''} recebido{alerts.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+              {alerts.length > 0 && (
+                <button
+                  onClick={handleClearAllAlerts}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-art-peach/10 hover:bg-art-peach/20 border-2 border-art-peach-border text-art-peach-dark rounded-2xl font-black text-xs uppercase tracking-widest transition-all art-btn-press"
+                  title="Limpar todos os alertas"
+                >
+                  <Trash2 size={14} />
+                  Limpar Todos
+                </button>
+              )}
+            </div>
+
             {alerts.length === 0 && (
               <div className="text-center py-24 text-slate-300">
                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-art-border">
@@ -429,9 +463,24 @@ export default function Professor() {
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-lg font-black text-art-navy tracking-tight">{alert.userName}</span>
-                    <div className="flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                      <Clock size={12} className="mr-1" />
-                      {alert.timestamp?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                        <Clock size={12} className="mr-1" />
+                        {alert.timestamp?.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            await deleteDoc(doc(db, 'alerts', alert.id));
+                          } catch (error) {
+                            handleFirestoreError(error, OperationType.DELETE, `alerts/${alert.id}`);
+                          }
+                        }}
+                        className="p-1.5 bg-slate-50 hover:bg-art-coral/10 hover:text-art-coral text-slate-300 rounded-xl transition-all"
+                        title="Descartar este alerta"
+                      >
+                        <X size={14} />
+                      </button>
                     </div>
                   </div>
                   <p className="text-slate-500 font-medium leading-tight">Estado: <strong className="text-art-peach-dark uppercase tracking-wide bg-art-peach/30 px-2 py-0.5 rounded-lg">{alert.type}</strong></p>

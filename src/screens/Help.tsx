@@ -10,6 +10,7 @@ export default function Help() {
   const navigate = useNavigate();
   const user = useAppStore(state => state.user);
   const [showToast, setShowToast] = useState(false);
+  const [activeButton, setActiveButton] = useState<typeof helpButtons[0] | null>(null);
 
   const helpButtons = [
     { id: 'help', text: 'Preciso de ajuda', voice: 'Preciso de ajuda, por favor.', icon: Info, color: 'bg-art-lime', border: 'border-art-lime-border', iconColor: 'text-art-lime-dark' },
@@ -33,9 +34,13 @@ export default function Help() {
         type: item.text,
         timestamp: serverTimestamp(),
       });
-      // Show success toast instead of browser blocking alert
+      // Show success toast
+      setActiveButton(item);
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 4000);
+      setTimeout(() => {
+        setShowToast(false);
+        setActiveButton(null);
+      }, 4000);
     } catch (e) {
       handleFirestoreError(e, OperationType.CREATE, fieldPath);
     }
@@ -75,23 +80,58 @@ export default function Help() {
         ))}
       </div>
 
-      {/* Floating Toast Notification */}
+      {/* Floating Toast Notification — fixed no centro da tela */}
       <AnimatePresence>
         {showToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-6 left-6 right-6 bg-art-teal border-2 border-art-sage-dark p-4 rounded-[24px] shadow-xl flex items-center space-x-3 z-30"
-          >
-            <div className="bg-white rounded-full p-1.5 text-art-navy shrink-0">
-              <CheckCircle size={20} />
-            </div>
-            <div>
-              <p className="font-black text-sm text-art-navy uppercase">Professor Avisado!</p>
-              <p className="text-xs text-art-navy font-bold opacity-85">O professor já recebeu o alerta. Fique tranquilo!</p>
-            </div>
-          </motion.div>
+          <>
+            {/* Overlay escurecido */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => { setShowToast(false); setActiveButton(null); }}
+              className="fixed inset-0 bg-black/40 z-40"
+            />
+            {/* Card de confirmação centralizado */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ type: 'spring', damping: 18, stiffness: 300 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85vw] max-w-sm bg-white rounded-[40px] shadow-2xl flex flex-col items-center text-center p-10 z-50 border-b-8 border-art-sage-dark"
+            >
+              {/* Ícone animado */}
+              <motion.div
+                initial={{ scale: 0, rotate: -30 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 250 }}
+                className={`w-24 h-24 ${activeButton?.color || 'bg-art-teal'} rounded-[32px] flex items-center justify-center shadow-lg mb-6 border-b-4 ${activeButton?.border || 'border-art-sage-border'}`}
+              >
+                <CheckCircle size={52} className="text-white" />
+              </motion.div>
+
+              <p className="text-3xl font-black text-art-navy tracking-tight leading-tight mb-2">
+                Professor Avisado!
+              </p>
+              <p className="text-base font-bold text-slate-400 mb-2">
+                Sua mensagem foi enviada:
+              </p>
+              <span className={`text-lg font-black px-5 py-2 rounded-2xl ${activeButton?.color || 'bg-art-teal'} ${activeButton?.iconColor || 'text-art-navy'} mb-8`}>
+                {activeButton?.text || 'Pedido de ajuda'}
+              </span>
+              <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+                Fique tranquilo, ele já sabe! 💚
+              </p>
+
+              {/* Barra de progresso */}
+              <motion.div
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: 4, ease: 'linear' }}
+                className="absolute bottom-0 left-0 h-2 bg-art-teal rounded-b-[40px]"
+              />
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
