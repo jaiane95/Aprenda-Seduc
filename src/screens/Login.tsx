@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { motion } from 'motion/react';
-import { ShieldCheck, User } from 'lucide-react';
+import { ShieldCheck, User, Building } from 'lucide-react';
 
 export default function Login() {
   const [pin, setPin] = useState('');
-  const [role, setRole] = useState<'student' | 'professor'>('student');
+  const [role, setRole] = useState<'student' | 'professor' | 'manager'>('student');
   
   // App store states
   const { turmas, users, setUser, setUsers, setTurmas } = useAppStore();
@@ -33,8 +33,11 @@ export default function Login() {
           setPin('');
         }
       } else if (role === 'professor') {
-        // Teacher login with 9999 master pin
-        if (pin === '9999') {
+        const teacherRecord = users.find(u => u.role === 'professor' && u.pin === pin);
+        if (teacherRecord) {
+          setUser(teacherRecord);
+          navigate('/professor');
+        } else if (pin === '9999') {
           const mockUser = {
             uid: 'teacher456',
             name: 'Prof. Luísa',
@@ -47,7 +50,24 @@ export default function Login() {
           setUser(mockUser);
           navigate('/professor');
         } else {
-          setErrorMsg('PIN Professor inválido! (Dica: tente 9999)');
+          setErrorMsg('PIN Professor incorreto! Verifique com o gestor. (Dica: tente 9999)');
+          setPin('');
+        }
+      } else if (role === 'manager') {
+        if (pin === '8888') {
+          const mockUser = {
+            uid: 'manager789',
+            name: 'Gestor Escolar',
+            role: 'manager' as const,
+            avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Manager',
+            coins: 0,
+            unlockedItems: [],
+            completedActivities: []
+          };
+          setUser(mockUser);
+          navigate('/manager');
+        } else {
+          setErrorMsg('PIN Gestor inválido! (Dica: tente 8888)');
           setPin('');
         }
       }
@@ -59,7 +79,7 @@ export default function Login() {
   };
 
   // Reset progress when changing role
-  const handleRoleChange = (newRole: 'student' | 'professor') => {
+  const handleRoleChange = (newRole: 'student' | 'professor' | 'manager') => {
     setRole(newRole);
     setPin('');
     setSelectedTurmaId(null);
@@ -74,18 +94,20 @@ export default function Login() {
         animate={{ scale: 1, opacity: 1 }}
         className="mb-8 text-center"
       >
-        <div className={`w-28 h-28 rounded-[40px] flex items-center justify-center mb-4 shadow-xl shadow-slate-200/50 mx-auto border-4 border-white ${role === 'student' ? 'bg-art-rose/90' : 'bg-art-teal/90'}`}>
+        <div className={`w-28 h-28 rounded-[40px] flex items-center justify-center mb-4 shadow-xl shadow-slate-200/50 mx-auto border-4 border-white ${role === 'student' ? 'bg-art-rose/90' : role === 'professor' ? 'bg-art-teal/90' : 'bg-art-yellow/90'}`}>
           {role === 'student' && selectedStudent ? (
              <img src={selectedStudent.avatar} alt="Avatar" className="w-20 h-20 object-contain" />
           ) : role === 'student' ? (
              <User className="w-14 h-14 text-art-rose-dark opacity-80" />
-          ) : (
+          ) : role === 'professor' ? (
             <ShieldCheck className="w-14 h-14 text-art-navy" />
+          ) : (
+            <Building className="w-14 h-14 text-art-yellow-dark opacity-85" />
           )}
         </div>
         <h1 className="text-4xl font-black text-art-purple-dark tracking-tight">APRENDA<span className="text-art-coral">+</span></h1>
         <p className="text-slate-400 font-bold mt-1 uppercase tracking-widest text-xs">
-          {role === 'student' ? 'Bem-vindo, pequeno!' : 'Acesso do Educador'}
+          {role === 'student' ? 'Bem-vindo, pequeno!' : role === 'professor' ? 'Acesso do Educador' : 'Acesso do Gestor'}
         </p>
       </motion.div>
 
@@ -186,8 +208,8 @@ export default function Login() {
         </motion.div>
       )}
 
-      {/* STEP 3: Enter PIN (Available for Selected Student OR Professor) */}
-      {((role === 'student' && selectedStudent) || role === 'professor') && (
+      {/* STEP 3: Enter PIN (Available for Selected Student, Professor, or Manager) */}
+      {((role === 'student' && selectedStudent) || role === 'professor' || role === 'manager') && (
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -224,6 +246,15 @@ export default function Login() {
               <p className="text-xs text-slate-500 font-bold mb-1.5 uppercase tracking-wide">Educador, digite seu PIN master:</p>
               <div className="inline-block bg-art-teal/10 text-art-teal border border-art-teal/20 px-3 py-1 rounded-full text-xs font-black">
                 PIN: 9999
+              </div>
+            </div>
+          )}
+
+          {role === 'manager' && (
+            <div className="text-center mb-4 w-full">
+              <p className="text-xs text-slate-500 font-bold mb-1.5 uppercase tracking-wide">Gestor, digite seu PIN:</p>
+              <div className="inline-block bg-art-yellow/20 text-art-yellow-dark border border-art-yellow/30 px-3 py-1 rounded-full text-xs font-black">
+                PIN: 8888
               </div>
             </div>
           )}
@@ -275,6 +306,18 @@ export default function Login() {
           </div>
         </motion.div>
       )}
+
+      {/* School Associated Info and Gestor Quick Access Card */}
+      <div className="mt-8 bg-white/60 p-5 rounded-[32px] border border-art-border shadow-sm max-w-sm w-full text-center flex flex-col items-center">
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Escola Associada</span>
+        <h4 className="text-sm font-black text-art-navy mt-1">Escola Municipal Aprender Mais</h4>
+        <button 
+          onClick={() => handleRoleChange('manager')}
+          className="mt-3 py-2 px-4 bg-white hover:bg-slate-50 border-2 border-slate-200 text-[10px] font-black uppercase text-art-teal hover:border-art-teal rounded-full transition-all tracking-wider art-btn-press"
+        >
+          Acessar como Gestor (PIN: 8888)
+        </button>
+      </div>
     </div>
   );
 }

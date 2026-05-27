@@ -34,7 +34,7 @@ export default function Home() {
             <BookOpen className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-art-purple-dark leading-none">
+            <h1 className="text-xl font-black tracking-tight text-art-purple-dark leading-none">
               APRENDA<span className="text-art-coral">+</span>
             </h1>
             {userTurma && (
@@ -53,7 +53,7 @@ export default function Home() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none mb-1">OLÁ!</span>
             <span className="text-sm font-bold text-art-navy leading-none">{user?.name}</span>
           </div>
-          <button 
+          <button
             onClick={() => { setUser(null); navigate('/'); }}
             className="ml-2 text-slate-300 hover:text-art-peach-dark transition"
           >
@@ -111,8 +111,8 @@ export default function Home() {
           </div>
           <div className="w-px h-5 bg-slate-100"></div>
           <div className="flex items-center gap-2 text-slate-400">
-             <Calendar size={14} />
-             <span className="text-xs font-bold uppercase">Hoje</span>
+            <Calendar size={14} />
+            <span className="text-xs font-bold uppercase">Hoje</span>
           </div>
         </div>
       </footer>

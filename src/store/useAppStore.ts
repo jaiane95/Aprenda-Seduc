@@ -6,7 +6,7 @@ import { doc, updateDoc, setDoc, deleteDoc, collection } from 'firebase/firestor
 export interface User {
   uid: string;
   name: string;
-  role: 'student' | 'professor';
+  role: 'student' | 'professor' | 'manager';
   avatar?: string;
   coins: number;
   unlockedItems: string[];

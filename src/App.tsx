@@ -13,11 +13,16 @@ import Activity from './screens/Activity';
 import Help from './screens/Help';
 import AvatarScreen from './screens/AvatarScreen';
 import Professor from './screens/Professor';
+import Manager from './screens/Manager';
 
-const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 'student' | 'professor' }) => {
+const ProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 'student' | 'professor' | 'manager' }) => {
   const user = useAppStore((state) => state.user);
   if (!user) return <Navigate to="/" />;
-  if (role && user.role !== role) return <Navigate to="/home" />;
+  if (role && user.role !== role) {
+    if (user.role === 'manager') return <Navigate to="/manager" />;
+    if (user.role === 'professor') return <Navigate to="/professor" />;
+    return <Navigate to="/home" />;
+  }
   return <>{children}</>;
 };
 
@@ -124,6 +129,14 @@ export default function App() {
             element={
               <ProtectedRoute role="professor">
                 <Professor />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/manager" 
+            element={
+              <ProtectedRoute role="manager">
+                <Manager />
               </ProtectedRoute>
             } 
           />
