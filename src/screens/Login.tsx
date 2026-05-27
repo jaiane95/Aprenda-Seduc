@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import { motion } from 'motion/react';
 import { ShieldCheck, User } from 'lucide-react';
-import { db, bootstrapFirebaseIfNeeded, handleFirestoreError, OperationType } from '../services/firebase';
-import { collection, getDocs } from 'firebase/firestore';
 
 export default function Login() {
   const [pin, setPin] = useState('');
   const [role, setRole] = useState<'student' | 'professor'>('student');
   
   // App store states
-  const { turmas, users, setUser, setUsers } = useAppStore();
+  const { turmas, users, setUser, setUsers, setTurmas } = useAppStore();
   
   // Student progression states
   const [selectedTurmaId, setSelectedTurmaId] = useState<string | null>(null);
@@ -19,22 +17,6 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   
   const navigate = useNavigate();
-
-  useEffect(() => {
-    async function initFirebaseData() {
-      try {
-        await bootstrapFirebaseIfNeeded();
-        const usersSnap = await getDocs(collection(db, 'users'));
-        const loadedUsers = usersSnap.docs.map(doc => ({ uid: doc.id, ...doc.data() } as any));
-        if (loadedUsers.length > 0) {
-          setUsers(loadedUsers);
-        }
-      } catch (error) {
-        handleFirestoreError(error, OperationType.GET, 'users');
-      }
-    }
-    initFirebaseData();
-  }, [setUsers]);
 
   const handleLogin = () => {
     if (pin.length === 4) {

@@ -63,24 +63,10 @@ export default function Professor() {
   const handleAddStudent = async () => {
     if (!newStudent.name) return;
     
-    // Generate a unique 4-digit PIN
+    // Generate a 4-digit PIN if not provided or invalid
     let pin = newStudent.pin || '';
     if (pin.length !== 4 || isNaN(Number(pin))) {
-      let isUnique = false;
-      let attempts = 0;
-      while (!isUnique && attempts < 100) {
-        pin = Math.floor(1000 + Math.random() * 9000).toString();
-        isUnique = !users.some(u => u.role === 'student' && u.pin === pin);
-        attempts++;
-      }
-      if (!isUnique) pin = '1234';
-    } else {
-      // Check if pin is already used
-      const pinExists = users.some(u => u.role === 'student' && u.pin === pin);
-      if (pinExists) {
-        alert("Este PIN já está sendo usado por outro aluno!");
-        return;
-      }
+      pin = Math.floor(1000 + Math.random() * 9000).toString();
     }
 
     const student: any = {
@@ -135,12 +121,6 @@ export default function Professor() {
     if (!studentEditForm.name.trim()) return;
     if (studentEditForm.pin.length !== 4 || isNaN(Number(studentEditForm.pin))) {
       alert("O PIN deve ter exatamente 4 números!");
-      return;
-    }
-    
-    const pinExists = users.some(u => u.uid !== uid && u.role === 'student' && u.pin === studentEditForm.pin);
-    if (pinExists) {
-      alert("Este PIN já está sendo usado por outro aluno!");
       return;
     }
 

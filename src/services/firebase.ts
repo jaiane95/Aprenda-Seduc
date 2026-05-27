@@ -71,6 +71,7 @@ testConnection();
 export async function bootstrapFirebaseIfNeeded() {
   const usersPath = 'users';
   try {
+    // 1. Seed users if empty
     const usersSnap = await getDocs(collection(db, usersPath));
     if (usersSnap.empty) {
       console.log('Seeding initial data to Firestore database...');
@@ -126,7 +127,34 @@ export async function bootstrapFirebaseIfNeeded() {
       }
 
       await batch.commit();
-      console.log('Successfully bootstrapped Firestore database!');
+      console.log('Successfully bootstrapped Firestore database users!');
+    }
+
+    // 2. Seed turmas if empty
+    const turmasSnap = await getDocs(collection(db, 'turmas'));
+    if (turmasSnap.empty) {
+      console.log('Seeding initial turmas to Firestore database...');
+      const today = new Date().toISOString().split('T')[0];
+      const defaultTurma = {
+        id: 'turma-1',
+        name: '1º Ano A',
+        activities: {
+          'Português': [
+            { id: 'p1', date: today, type: 'ident', question: 'Qual letra começa a palavra BOLA?', options: ['B', 'D', 'P'], correct: 'B' },
+            { id: 'p2', date: today, type: 'ident', question: 'Qual dessas figuras começa com a letra A?', options: ['🍎', '⚽', '🚗'], correct: '🍎' },
+          ],
+          'Matemática': [
+            { id: 'm1', date: today, type: 'sum', question: 'Quanto é 2 + 1?', options: ['2', '3', '4'], correct: '3' },
+            { id: 'm2', date: today, type: 'sum', question: 'Quanto é 5 + 0?', options: ['0', '5', '10'], correct: '5' },
+          ],
+          'Ciências': [
+            { id: 'c1', date: today, type: 'ident', question: 'Onde vive o PEIXE?', options: ['Água', 'Terra', 'Ar'], correct: 'Água' },
+            { id: 'c2', date: today, type: 'ident', question: 'O que o SOL nos dá?', options: ['Chuva', 'Luz e Calor', 'Vento'], correct: 'Luz e Calor' },
+          ]
+        }
+      };
+      await setDoc(doc(db, 'turmas', 'turma-1'), defaultTurma);
+      console.log('Successfully bootstrapped turmas in Firestore!');
     }
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, usersPath);

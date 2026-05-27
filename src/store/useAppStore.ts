@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { db } from '../services/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export interface User {
   uid: string;
@@ -161,38 +161,77 @@ export const useAppStore = create<AppState>()(
       setUsers: (users) => set({ users }),
       addStudent: (student) => set((state) => ({ users: [...state.users, student] })),
       deleteStudent: (uid) => set((state) => ({ users: state.users.filter(u => u.uid !== uid) })),
-      updateTurmaActivities: (turmaId, subject, activities) => set((state) => ({
-        turmas: state.turmas.map(t => t.id === turmaId ? { ...t, activities: { ...t.activities, [subject]: activities } } : t)
-      })),
-      renameSubject: (turmaId, oldName, newName) => set((state) => ({
-        turmas: state.turmas.map(t => {
+      updateTurmaActivities: (turmaId, subject, activities) => set((state) => {
+        const updatedTurmas = state.turmas.map(t => t.id === turmaId ? { ...t, activities: { ...t.activities, [subject]: activities } } : t);
+        const updatedTurma = updatedTurmas.find(t => t.id === turmaId);
+        if (updatedTurma) {
+          updateDoc(doc(db, 'turmas', turmaId), { activities: updatedTurma.activities })
+            .catch(e => console.error('Error updating activities in Firestore:', e));
+        }
+        return { turmas: updatedTurmas };
+      }),
+      renameSubject: (turmaId, oldName, newName) => set((state) => {
+        const updatedTurmas = state.turmas.map(t => {
           if (t.id !== turmaId) return t;
           const newActivities = { ...t.activities };
           newActivities[newName] = newActivities[oldName];
           delete newActivities[oldName];
           return { ...t, activities: newActivities };
-        })
-      })),
-      addSubject: (turmaId, name) => set((state) => ({
-        turmas: state.turmas.map(t => {
+        });
+        const updatedTurma = updatedTurmas.find(t => t.id === turmaId);
+        if (updatedTurma) {
+          updateDoc(doc(db, 'turmas', turmaId), { activities: updatedTurma.activities })
+            .catch(e => console.error('Error renaming subject in Firestore:', e));
+        }
+        return { turmas: updatedTurmas };
+      }),
+      addSubject: (turmaId, name) => set((state) => {
+        const updatedTurmas = state.turmas.map(t => {
           if (t.id !== turmaId) return t;
           return { ...t, activities: { ...t.activities, [name]: [] } };
-        })
-      })),
-      deleteSubject: (turmaId, name) => set((state) => ({
-        turmas: state.turmas.map(t => {
+        });
+        const updatedTurma = updatedTurmas.find(t => t.id === turmaId);
+        if (updatedTurma) {
+          updateDoc(doc(db, 'turmas', turmaId), { activities: updatedTurma.activities })
+            .catch(e => console.error('Error adding subject in Firestore:', e));
+        }
+        return { turmas: updatedTurmas };
+      }),
+      deleteSubject: (turmaId, name) => set((state) => {
+        const updatedTurmas = state.turmas.map(t => {
           if (t.id !== turmaId) return t;
           const newActivities = { ...t.activities };
           delete newActivities[name];
           return { ...t, activities: newActivities };
-        })
-      })),
-      addTurma: (name) => set((state) => ({
-        turmas: [...state.turmas, { id: `turma-${Date.now()}`, name, activities: { ...DEFAULT_ACTIVITIES } }]
-      })),
-      deleteTurma: (turmaId) => set((state) => ({
-        turmas: state.turmas.filter(t => t.id !== turmaId)
-      })),
+        });
+        const updatedTurma = updatedTurmas.find(t => t.id === turmaId);
+        if (updatedTurma) {
+          updateDoc(doc(db, 'turmas', turmaId), { activities: updatedTurma.activities })
+            .catch(e => console.error('Error deleting subject in Firestore:', e));
+        }
+        return { turmas: updatedTurmas };
+      }),
+      addTurma: (name) => set((state) => {
+        const newId = `turma-${Date.now()}`;
+        const newTurma = { id: newId, name, activities: { ...DEFAULT_ACTIVITIES } };
+        
+        // Async Firestore update
+        const docRef = doc(db, 'turmas', newId);
+        setDoc(docRef, newTurma).catch(e => console.error('Error adding turma to Firestore:', e));
+        
+        return {
+          turmas: [...state.turmas, newTurma]
+        };
+      }),
+      deleteTurma: (turmaId) => set((state) => {
+        // Async Firestore update
+        const docRef = doc(db, 'turmas', turmaId);
+        deleteDoc(docRef).catch(e => console.error('Error deleting turma from Firestore:', e));
+        
+        return {
+          turmas: state.turmas.filter(t => t.id !== turmaId)
+        };
+      }),
       setMood: (mood) => set((state) => {
         if (!state.user) return {};
         const updatedUser = { ...state.user, mood };
