@@ -58,16 +58,21 @@ O desenvolvimento do APRENDA+ seguiu uma metodologia de **construção progressi
 
 ## 📦 Como Executar o Projeto Localmente
 
-1.  Certifique-se de ter o **Node.js** instalado.
-2.  Instale as dependências executando:
-    ```bash
-    npm install
-    ```
-3.  Inicie o servidor de desenvolvimento:
-    ```bash
-    npm run dev
-    ```
-4.  Para gerar o build de produção compilado:
-    ```bash
-    npm run build
-    ```
+### Pré-requisitos
+Antes de começar, você precisa ter instalado em sua máquina:
+* [Git](https://git-scm.com) (ferramenta de controle de versão).
+* [Node.js](https://nodejs.org) (ambiente de execução JavaScript).
+
+### Instruções para Rodar o App
+1. Instale as dependências executando no seu terminal:
+   ```bash
+   npm install
+   ```
+
+2. Inicie o servidor de desenvolvimento local:
+   ```bash
+   npm run dev
+   ```
+
+3. Acesse a aplicação no seu navegador através do link padrão:
+   * [http://localhost:3000](http://localhost:3000)
