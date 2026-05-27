@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { db } from '../services/firebase';
-import { doc, updateDoc, setDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 
 export interface User {
   uid: string;
@@ -66,6 +66,7 @@ interface AppState {
   setMood: (mood: string) => void;
   completeActivity: (activityId: string) => void;
   setAvatarName: (name: string) => void;
+  logActivityAttempt: (activityId: string, category: string, question: string, answer: string, isCorrect: boolean) => void;
 }
 
 const today = new Date().toISOString().split('T')[0];
@@ -96,7 +97,7 @@ async function updateFirestoreUser(userId: string, data: Partial<User>) {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       setUser: (user) => set({ user, coins: user ? user.coins : 0 }),
       routines: [],
@@ -131,6 +132,17 @@ export const useAppStore = create<AppState>()(
           unlockedItems: newUnlocked,
           coins: newCoins
         });
+
+        // Save purchase log to Firestore subcollection users/{userId}/purchase_logs
+        const timestamp = new Date().toISOString();
+        const dateStr = timestamp.split('T')[0];
+        const purchaseLogRef = doc(collection(db, `users/${state.user.uid}/purchase_logs`));
+        setDoc(purchaseLogRef, {
+          itemId,
+          cost,
+          date: dateStr,
+          timestamp
+        }).catch(e => console.error('Error logging purchase to Firestore:', e));
 
         return {
           coins: newCoins,
@@ -234,6 +246,16 @@ export const useAppStore = create<AppState>()(
 
         updateFirestoreUser(state.user.uid, { mood });
 
+        // Save mood log to Firestore subcollection users/{userId}/mood_logs
+        const timestamp = new Date().toISOString();
+        const dateStr = timestamp.split('T')[0];
+        const moodLogRef = doc(collection(db, `users/${state.user.uid}/mood_logs`));
+        setDoc(moodLogRef, {
+          mood,
+          date: dateStr,
+          timestamp
+        }).catch(e => console.error('Error logging mood change to Firestore:', e));
+
         return {
           user: updatedUser,
           users: updatedUsers
@@ -269,6 +291,24 @@ export const useAppStore = create<AppState>()(
           users: updatedUsers
         };
       }),
+      logActivityAttempt: (activityId, category, question, answer, isCorrect) => {
+        const state = get();
+        if (!state.user) return;
+
+        const timestamp = new Date().toISOString();
+        const dateStr = timestamp.split('T')[0];
+
+        const attemptLogRef = doc(collection(db, `users/${state.user.uid}/activity_logs`));
+        setDoc(attemptLogRef, {
+          activityId,
+          category,
+          question,
+          answer,
+          isCorrect,
+          date: dateStr,
+          timestamp
+        }).catch(e => console.error('Error logging activity attempt to Firestore:', e));
+      },
     }),
     {
       name: 'aprendaplus-storage-v2',

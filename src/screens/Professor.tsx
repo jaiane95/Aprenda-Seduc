@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
   ArrowLeft, Users, Bell, ThumbsUp, Clock, AlertTriangle, 
-  Plus, BookOpen, Settings, Layout, Save, Trash2, Edit2, Check, ChevronLeft, ChevronRight 
+  Plus, BookOpen, Settings, Layout, Save, Trash2, Edit2, Check, ChevronLeft, ChevronRight, BarChart2, X 
 } from 'lucide-react';
-import { collection, onSnapshot, query, orderBy, limit, doc, setDoc, deleteDoc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, limit, doc, setDoc, deleteDoc, updateDoc, writeBatch, getDocs } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../services/firebase';
 import { useAppStore, ActivityItem } from '../store/useAppStore';
 
@@ -47,6 +47,93 @@ export default function Professor() {
     });
     return () => unsubscribe();
   }, []);
+
+  const [moodLogs, setMoodLogs] = useState<any[]>([]);
+  const [activityLogs, setActivityLogs] = useState<any[]>([]);
+  const [purchaseLogs, setPurchaseLogs] = useState<any[]>([]);
+  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+  const [reportTab, setReportTab] = useState<'summary' | 'mood' | 'activities'>('summary');
+
+  useEffect(() => {
+    if (!selectedStudent) {
+      setMoodLogs([]);
+      setActivityLogs([]);
+      setPurchaseLogs([]);
+      return;
+    }
+
+    async function loadStudentLogs() {
+      setIsLoadingLogs(true);
+      try {
+        const moodSnap = await getDocs(
+          query(collection(db, `users/${selectedStudent.uid}/mood_logs`), orderBy('timestamp', 'desc'))
+        );
+        const activitySnap = await getDocs(
+          query(collection(db, `users/${selectedStudent.uid}/activity_logs`), orderBy('timestamp', 'desc'))
+        );
+        const purchaseSnap = await getDocs(
+          query(collection(db, `users/${selectedStudent.uid}/purchase_logs`), orderBy('timestamp', 'desc'))
+        );
+
+        let moods = moodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        let activities = activitySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        let purchases = purchaseSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Seeding mock historical data on-demand if the database logs are entirely empty
+        if (moodSnap.empty && activitySnap.empty && purchaseSnap.empty) {
+          const batch = writeBatch(db);
+          const today = new Date().toISOString().split('T')[0];
+          const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+          
+          const moodsToSeed = [
+            { mood: '😊 Feliz', date: today, timestamp: new Date().toISOString() },
+            { mood: '😴 Cansado', date: yesterday, timestamp: new Date(Date.now() - 86400000).toISOString() }
+          ];
+          for (const m of moodsToSeed) {
+            batch.set(doc(collection(db, `users/${selectedStudent.uid}/mood_logs`)), m);
+          }
+
+          const activitiesToSeed = [
+            { activityId: 'p1', category: 'Português', question: 'Qual letra começa a palavra BOLA?', answer: 'B', isCorrect: true, date: today, timestamp: new Date().toISOString() },
+            { activityId: 'm1', category: 'Matemática', question: 'Quanto é 2 + 1?', answer: '2', isCorrect: false, date: today, timestamp: new Date(Date.now() - 5000).toISOString() },
+            { activityId: 'm1', category: 'Matemática', question: 'Quanto é 2 + 1?', answer: '3', isCorrect: true, date: today, timestamp: new Date().toISOString() },
+            { activityId: 'c1', category: 'Ciências', question: 'Onde vive o PEIXE?', answer: 'Água', isCorrect: true, date: yesterday, timestamp: new Date(Date.now() - 86400000).toISOString() }
+          ];
+          for (const a of activitiesToSeed) {
+            batch.set(doc(collection(db, `users/${selectedStudent.uid}/activity_logs`)), a);
+          }
+
+          const purchasesToSeed = [
+            { itemId: 'boneco-1', cost: 10, date: today, timestamp: new Date().toISOString() }
+          ];
+          for (const p of purchasesToSeed) {
+            batch.set(doc(collection(db, `users/${selectedStudent.uid}/purchase_logs`)), p);
+          }
+
+          await batch.commit();
+          
+          // Refetch
+          const refetchedMood = await getDocs(query(collection(db, `users/${selectedStudent.uid}/mood_logs`), orderBy('timestamp', 'desc')));
+          const refetchedActivity = await getDocs(query(collection(db, `users/${selectedStudent.uid}/activity_logs`), orderBy('timestamp', 'desc')));
+          const refetchedPurchase = await getDocs(query(collection(db, `users/${selectedStudent.uid}/purchase_logs`), orderBy('timestamp', 'desc')));
+          
+          moods = refetchedMood.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          activities = refetchedActivity.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          purchases = refetchedPurchase.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        }
+
+        setMoodLogs(moods);
+        setActivityLogs(activities);
+        setPurchaseLogs(purchases);
+      } catch (error) {
+        console.error('Error loading student logs:', error);
+      } finally {
+        setIsLoadingLogs(false);
+      }
+    }
+
+    loadStudentLogs();
+  }, [selectedStudent]);
 
   const handleDeleteStudent = async (uid: string, name: string) => {
     if (window.confirm(`Tem certeza que deseja excluir o aluno ${name}?`)) {
@@ -252,6 +339,21 @@ export default function Professor() {
 
   const studentsInTurma = users.filter(u => u.role === 'student');
   const filteredStudents = studentsInTurma.filter(u => filterTurmaId === 'all' || u.turmaId === filterTurmaId);
+
+  // Computed metrics for Student Report Dashboard
+  const totalAttempts = activityLogs.length;
+  const totalCorrect = activityLogs.filter(log => log.isCorrect).length;
+  const totalErrors = activityLogs.filter(log => !log.isCorrect).length;
+  const successRate = totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0;
+
+  const subjectsList = ['Português', 'Matemática', 'Ciências'];
+  const subjectStats = subjectsList.map(sub => {
+    const logs = activityLogs.filter(log => log.category === sub);
+    const correct = logs.filter(log => log.isCorrect).length;
+    const attempts = logs.length;
+    const rate = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
+    return { name: sub, attempts, correct, rate };
+  });
 
   return (
     <div className="flex-1 flex flex-col bg-art-bg relative overflow-hidden">
@@ -482,6 +584,13 @@ export default function Professor() {
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
+                          <button 
+                            onClick={() => setSelectedStudent(student)}
+                            className="p-3 bg-slate-50 text-slate-500 rounded-2xl hover:text-art-teal hover:bg-art-teal/5 transition-all"
+                            title="Ver Relatório de Desempenho"
+                          >
+                            <BarChart2 size={18} />
+                          </button>
                           <button 
                             onClick={() => handleStartEditStudent(student)}
                             className="p-3 bg-slate-50 text-slate-500 rounded-2xl hover:text-art-teal hover:bg-art-teal/5 transition-all"
@@ -738,6 +847,190 @@ export default function Professor() {
           </div>
         )}
       </div>
+
+      {/* Slide-over Relatório de Desempenho do Aluno */}
+      {selectedStudent && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-end">
+          <motion.div 
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            className="w-full max-w-2xl bg-art-bg h-full flex flex-col shadow-2xl relative"
+          >
+            {/* Header */}
+            <div className="p-6 bg-art-navy text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-white/10 rounded-2xl p-1.5 overflow-hidden flex-shrink-0">
+                  <img src={selectedStudent.avatar} alt={selectedStudent.name} className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-white">{selectedStudent.name}</h2>
+                  <p className="text-white/60 text-xs font-bold uppercase tracking-widest">
+                    {turmas.find(t => t.id === selectedStudent.turmaId)?.name || 'Sem turma'}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedStudent(null)} 
+                className="p-2.5 hover:bg-white/10 rounded-2xl transition"
+              >
+                <X size={24} className="text-white" />
+              </button>
+            </div>
+
+            {/* Inner Tabs */}
+            <div className="flex bg-white px-4 border-b border-art-border shrink-0">
+              <button 
+                onClick={() => setReportTab('summary')}
+                className={`flex-1 py-4 font-black uppercase tracking-widest text-[10px] text-center border-b-4 transition-all ${reportTab === 'summary' ? 'text-art-navy border-art-teal' : 'text-slate-300'}`}
+              >
+                Resumo Geral
+              </button>
+              <button 
+                onClick={() => setReportTab('mood')}
+                className={`flex-1 py-4 font-black uppercase tracking-widest text-[10px] text-center border-b-4 transition-all ${reportTab === 'mood' ? 'text-art-navy border-art-teal' : 'text-slate-300'}`}
+              >
+                Histórico de Humor
+              </button>
+              <button 
+                onClick={() => setReportTab('activities')}
+                className={`flex-1 py-4 font-black uppercase tracking-widest text-[10px] text-center border-b-4 transition-all ${reportTab === 'activities' ? 'text-art-navy border-art-teal' : 'text-slate-300'}`}
+              >
+                Atividades ({activityLogs.length})
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 p-6 overflow-y-auto space-y-6">
+              {isLoadingLogs ? (
+                <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                  <div className="w-12 h-12 border-4 border-art-teal border-t-transparent rounded-full animate-spin" />
+                  <p className="text-slate-400 font-bold animate-pulse text-sm">Carregando relatório do aluno...</p>
+                </div>
+              ) : (
+                <>
+                  {reportTab === 'summary' && (
+                    <div className="space-y-6">
+                      {/* Metric Cards Grid */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white p-6 rounded-[32px] border border-art-border flex flex-col justify-between shadow-sm">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Moedas Acumuladas</span>
+                          <span className="text-3xl font-black text-art-yellow-dark mt-2">⭐ {selectedStudent.coins || 0}</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-[32px] border border-art-border flex flex-col justify-between shadow-sm">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Itens Comprados</span>
+                          <span className="text-3xl font-black text-art-teal mt-2">🛍️ {selectedStudent.unlockedItems?.length || 0} itens</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-[32px] border border-art-border flex flex-col justify-between shadow-sm">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Tentativas Realizadas</span>
+                          <span className="text-3xl font-black text-art-navy mt-2">📝 {totalAttempts}</span>
+                        </div>
+                        <div className="bg-white p-6 rounded-[32px] border border-art-border flex flex-col justify-between shadow-sm">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Taxa de Acerto</span>
+                          <span className="text-3xl font-black text-art-rose mt-2">🎯 {successRate}%</span>
+                        </div>
+                      </div>
+
+                      {/* Performance by Subject */}
+                      <div className="bg-white p-6 rounded-[32px] border border-art-border shadow-sm space-y-4">
+                        <h3 className="font-black text-art-navy text-sm uppercase tracking-wide">Desempenho por Disciplina</h3>
+                        <div className="space-y-4">
+                          {subjectStats.map(stat => (
+                            <div key={stat.name} className="space-y-1">
+                              <div className="flex justify-between items-center text-xs font-black text-art-navy">
+                                <span>{stat.name}</span>
+                                <span>{stat.correct}/{stat.attempts} acertos ({stat.rate}%)</span>
+                              </div>
+                              <div className="w-full bg-slate-100 h-3.5 rounded-full overflow-hidden border border-slate-200">
+                                <div 
+                                  className="bg-art-teal h-full rounded-full transition-all duration-500" 
+                                  style={{ width: `${stat.rate}%` }} 
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Purchase log list */}
+                      <div className="bg-white p-6 rounded-[32px] border border-art-border shadow-sm space-y-4">
+                        <h3 className="font-black text-art-navy text-sm uppercase tracking-wide">Últimas Compras na Loja</h3>
+                        {purchaseLogs.length === 0 ? (
+                          <p className="text-xs text-slate-400 italic">Nenhum item comprado ainda.</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {purchaseLogs.map((p, idx) => (
+                              <div key={p.id || idx} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
+                                <div>
+                                  <span className="text-sm font-black text-art-navy">ID do Item: {p.itemId}</span>
+                                  <p className="text-[9px] text-slate-400 font-bold uppercase">{p.date}</p>
+                                </div>
+                                <span className="text-xs font-black text-art-yellow-dark">⭐ {p.cost} moedas</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {reportTab === 'mood' && (
+                    <div className="space-y-6">
+                      <div className="bg-white p-6 rounded-[32px] border border-art-border shadow-sm space-y-4">
+                        <h3 className="font-black text-art-navy text-sm uppercase tracking-wide">Linha do Tempo de Sentimentos</h3>
+                        {moodLogs.length === 0 ? (
+                          <p className="text-xs text-slate-400 italic">Nenhum registro de humor ainda.</p>
+                        ) : (
+                          <div className="relative border-l-4 border-slate-100 ml-4 pl-6 space-y-6 py-2">
+                            {moodLogs.map((m, idx) => (
+                              <div key={m.id || idx} className="relative">
+                                {/* Dot */}
+                                <div className="absolute -left-[30px] top-1.5 w-4 h-4 bg-art-teal rounded-full border-4 border-white" />
+                                <div>
+                                  <span className="text-xs font-black text-slate-400 uppercase">{m.date}</span>
+                                  <h4 className="text-2xl font-black text-art-navy mt-1">{m.mood}</h4>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {reportTab === 'activities' && (
+                    <div className="space-y-4">
+                      {activityLogs.length === 0 ? (
+                        <div className="bg-white p-8 rounded-[32px] border border-art-border text-center text-slate-400 font-bold">
+                          Nenhuma atividade respondida ainda.
+                        </div>
+                      ) : (
+                        activityLogs.map((log, idx) => (
+                          <div key={log.id || idx} className="bg-white p-6 rounded-[32px] border border-art-border shadow-sm space-y-3">
+                            <div className="flex justify-between items-start">
+                              <span className="bg-art-teal/20 text-art-navy border border-art-teal/30 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase">
+                                {log.category}
+                              </span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase ${log.isCorrect ? 'bg-art-lime/20 text-art-lime-dark border border-art-lime/30' : 'bg-art-peach/20 text-art-peach-dark border border-art-peach/30'}`}>
+                                {log.isCorrect ? 'Acertou' : 'Errou'}
+                              </span>
+                            </div>
+                            <h4 className="font-black text-art-navy text-sm">{log.question}</h4>
+                            <div className="flex justify-between items-center text-xs">
+                              <p className="font-bold text-slate-400">Resposta dada: <strong className="text-art-navy">{log.answer}</strong></p>
+                              <span className="text-[9px] text-slate-300 font-black uppercase tracking-widest">{log.date}</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

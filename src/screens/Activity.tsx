@@ -7,7 +7,7 @@ import { useAppStore } from '../store/useAppStore';
 export default function Activity() {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
-  const { user, turmas, addCoins, coins, completeActivity } = useAppStore();
+  const { user, turmas, addCoins, coins, completeActivity, logActivityAttempt } = useAppStore();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showFeedback, setShowFeedback] = useState<null | 'correct' | 'wrong'>(null);
@@ -41,7 +41,12 @@ export default function Activity() {
   const handleAnswer = (option: string) => {
     if (showFeedback) return;
     
-    if (option === current.correct) {
+    const isCorrect = option === current.correct;
+    
+    // Log the answer attempt to Firestore
+    logActivityAttempt(current.id, category as string, current.question, option, isCorrect);
+    
+    if (isCorrect) {
       setShowFeedback('correct');
       addCoins(5);
       
