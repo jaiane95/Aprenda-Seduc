@@ -24,6 +24,7 @@ O principal objetivo é criar um espaço na internet simples e acolhedor para to
 
 ### 2. Painel do Professor (Acompanhamento)
 * **Cadastro de Alunos:** Criar, editar e excluir contas de alunos com facilidade, definindo uma senha numérica (PIN) simples de 4 dígitos.
+* **Cadastro de Turmas:** Criar, editar e excluir turmas com facilidade, definindo os alunos para cada turma.
 * **Criação de Atividades:** Adicionar novas perguntas nas matérias.
 * **Central de Chamados:** Ver na hora quais alunos pediram ajuda na sala.
 * **Relatório de Desempenho:** Gráficos simples que mostram os acertos do aluno por matéria, o histórico de humor (como ele tem se sentido) e os itens comprados na loja.
