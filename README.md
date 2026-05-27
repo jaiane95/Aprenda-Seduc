@@ -1,83 +1,76 @@
 # APRENDA+ — Educação Inclusiva & Gamificada 🌟
 
-O **APRENDA+** é uma aplicação educacional de suporte à inclusão, especialmente projetada para crianças com **Transtorno do Espectro Autista (TEA)** e **Transtorno do Déficit de Atenção com Hiperatividade (TDAH)**. A ferramenta une a previsibilidade de uma rotina estruturada com o reforço positivo da gamificação para incentivar a autonomia e o aprendizado de forma lúdica.
+O **APRENDA+** é um aplicativo escolar feito para ajudar no aprendizado de crianças de forma amigável, especialmente aquelas com **Autismo (TEA)** e **TDAH**. Ele mistura a organização de uma rotina diária com a diversão de jogos (gamificação), ajudando o aluno a aprender brincando e a se organizar sozinho.
 
 ---
 
 ## 💡 A Proposta
 
-O principal objetivo do projeto é oferecer um ambiente digital acessível e acolhedor que facilite o dia a dia pedagógico:
-* **Para Alunos:** Redução da ansiedade através de uma agenda visual clara e incentivo ao estudo por meio de atividades gamificadas que rendem recompensas virtuais (moedas para personalizar o próprio avatar).
-* **Para Professores:** Acompanhamento do progresso em tempo real, controle de questionários e visualização de alertas e relatórios de desempenho detalhados.
-* **Para Gestores:** Gestão do corpo docente, definição de acessos e monitoramento geral das turmas e disciplinas da escola.
+O principal objetivo é criar um espaço na internet simples e acolhedor para todo mundo na escola:
+* **Para Alunos:** Menos ansiedade com uma agenda visual bem simples e tarefas coloridas que dão moedas virtuais. Com essas moedas, você pode comprar itens e roupinhas na loja para o seu próprio bonequinho (avatar)!
+* **Para Professores:** Acompanhar as respostas dos alunos na hora, criar novas atividades e ver relatórios bem explicados sobre como os alunos estão indo.
+* **Para Gestores:** Cadastrar e organizar os professores, definir as turmas e monitorar o andamento geral da escola.
 
 ---
 
 ## 🎨 Funcionalidades Principais
 
-### 1. Área do Aluno (Experiência Gamificada)
-*   **Rotina Visual Interativa:** Agenda estruturada em cartões visuais para dar previsibilidade às tarefas diárias da criança (reduzindo ansiedade e organizando o dia).
-*   **Atividades Pedagógicas Multidisciplinares:** Questionários dinâmicos de português, matemática e ciências, gerando reforço positivo imediato.
-*   **Gamificação & Loja de Avatares:** Os acertos nas atividades concedem créditos (moedas). O aluno pode gastar esses créditos na loja para adquirir itens e personalizar seu próprio boneco.
-*   **Nomeação do Boneco:** Opção direta e acolhedora para que o estudante dê um nome personalizado ao seu companheiro virtual de jornada.
-*   **Botão de Ajuda / Alerta:** Canal direto onde a criança pode sinalizar que está com dúvidas ou em crise, notificando a tela do professor.
+### 1. Área do Aluno (Estude Jogando!)
+* **Rotina Visual:** Uma lista de tarefas com cartões coloridos para a criança saber o que vai fazer no dia (evitando preocupação e surpresas).
+* **Atividades Divertidas:** Desafios rápidos de Português, Matemática e Ciências com balões de comemoração ao acertar.
+* **Loja de Avatares:** Cada acerto dá moedas! Use suas moedas para comprar itens e deixar o seu bonequinho com a sua cara.
+* **Dar Nome ao Boneco:** Você pode dar um nome personalizado para o seu bonequinho de estimação.
+* **Botão de Ajuda:** Se o aluno estiver com dúvidas ou chateado, ele pode clicar em um botão para avisar o professor na hora.
 
-### 2. Painel do Professor (Gestão & Acompanhamento)
-*   **Gerenciamento de Alunos:** Criação, edição de dados e exclusão de contas de estudantes com geração de PIN de segurança numérico exclusivo de 4 dígitos.
-*   **Gerenciamento de Classes e Conteúdos:** Criação e customização de atividades curriculares.
-*   **Central de Alertas em Tempo Real:** Monitor de notificações para ver os chamados de socorro ou dúvidas emitidos pelos alunos em sala.
-*   **Relatórios de Desempenho e Logs:** Painel de progresso detalhado por aluno (taxa de acerto global, acertos por disciplina, histórico de compras de avatares e linha do tempo de humor diário).
+### 2. Painel do Professor (Acompanhamento)
+* **Cadastro de Alunos:** Criar, editar e excluir contas de alunos com facilidade, definindo uma senha numérica (PIN) simples de 4 dígitos.
+* **Criação de Atividades:** Adicionar novas perguntas nas matérias.
+* **Central de Chamados:** Ver na hora quais alunos pediram ajuda na sala.
+* **Relatório de Desempenho:** Gráficos simples que mostram os acertos do aluno por matéria, o histórico de humor (como ele tem se sentido) e os itens comprados na loja.
 
-### 3. Painel do Gestor (Administração Escolar)
-*   **Gerenciamento do Corpo Docente:** Cadastro de professores com definição de nome e PIN de segurança de 4 dígitos personalizados.
-*   **Supervisão de Turmas e Disciplinas:** Visualização dinâmica dos alunos e disciplinas sob a coordenação de cada professor cadastrado.
-
----
-
-
-## 🛠️ Tecnologias Base do Projeto
-
-A stack do **APRENDA+** foi selecionada visando reatividade rápida, segurança de dados em tempo real e fluidez na execução das animações pedagógicas.
-
-### 💻 Frontend (Interface)
-*   **React + TypeScript (Vite):** Utiliza componentes funcionais estruturados e estritamente tipados para evitar erros em execução e proporcionar alta velocidade de carregamento.
-*   **Tailwind CSS:** Toda a interface utiliza as classes utilitárias do Tailwind para construir o tema customizado com tons amigáveis, reduzindo fadiga cognitiva e estresse sensorial.
-*   **motion (Framer Motion):** Aplicado no fluxo de transição de telas, interações com a rotina e conquistas de moedas, tornando o aplicativo vivo e recompensador.
-*   **Lucide React:** Uma coleção coesa de ícones lineares de fácil reconhecimento visual.
-
-### 🗄️ Estado e Sincronização (Banco de Dados & Sync)
-*   **Zustand (com Persistência Ativa):** Gerenciador de estado global robusto configurado com persistência sincronizada no `localStorage` do navegador (`aprendaplus-storage-v2`). Isso garante que, mesmo apagando ou recarregando o app, dados cruciais como a configuração do robô/boneco, itens já adquiridos e moedas remanescentes continuem preservados localmente para o aluno.
-*   **Firebase / Cloud Firestore:** Banco de dados NoSQL utilizado para persistir e propagar em tempo real as coleções de usuários, notificações de ajuda e rotinas personalizadas ao painel professor-aluno.
-*   **Regras de Segurança Integradas:** Políticas flexíveis de acesso no arquivo `firestore.rules` customizadas para permitir sincronizações simplificadas de relatórios e de progresso multidispositivos em sala de aula sem fricções.
+### 3. Painel do Gestor (Administração)
+* **Cadastrar Professores:** Criar contas para os professores com senhas (PINs) exclusivas.
+* **Ver Turmas e Alunos:** Acompanhar quais turmas e matérias cada professor está cuidando.
 
 ---
 
-## 🚀 Desenvolvimento Eficiente e Progressivo
+## 🛠️ Tecnologias Usadas
 
-O desenvolvimento do APRENDA+ seguiu uma metodologia de **construção progressiva e evolutiva** usando ferramentas de inteligência artificial de ponta:
+O aplicativo foi criado para ser rápido, seguro e muito bonito de usar.
 
-1.  **Google AI Studio:** Utilizado para conceber a lógica pedagógica inclusiva, criar questionários adequados e projetar heurísticas baseadas em boas práticas médicas e pedagógicas para crianças com TEA e TDAH.
-2.  **Agente Antigravity:** Atuou como copiloto técnico principal, refinando iterativamente cada componente, tratando os dados do Firestore com tolerância a erros através de middlewares, resolvendo problemas de linting estático e garantindo que cada atualização do banco estivesse alinhada com as compras de itens da loja e com a identidade visual dos avatares integrados.
+* **Interface Visual:** Feita com **React** e **TypeScript** para que as telas carreguem bem rápido e sem erros.
+* **Estilização:** Usa **Tailwind CSS** para criar cores suaves que não cansam a vista das crianças.
+* **Animações:** Usa a biblioteca **motion** para criar efeitos visuais divertidos, como moedas voando e transições suaves de tela.
+* **Banco de Dados:** Usa **Firebase / Firestore** para salvar na nuvem e atualizar as informações em tempo real (como os pedidos de ajuda e notas).
+* **Salvamento Local:** Usa **Zustand** para salvar as moedas e o bonequinho do aluno direto no navegador, assim o progresso não é perdido se a página atualizar.
+
+---
+
+## 🚀 Como o App foi Desenvolvido
+
+O APRENDA+ foi criado com a ajuda de inteligências artificiais avançadas:
+1. **Google AI Studio:** Ajudou a criar perguntas interessantes e a pensar em rotinas saudáveis recomendadas para crianças autistas e com TDAH.
+2. **Agente Antigravity:** Ajudou a escrever os códigos das telas, corrigir erros visuais e garantir que a loja de itens e os logs estivessem funcionando sem falhas.
 
 ---
 
 ## 📦 Como Executar o Projeto Localmente
 
 ### Pré-requisitos
-Antes de começar, você precisa ter instalado em sua máquina:
-* [Git](https://git-scm.com) (ferramenta de controle de versão).
-* [Node.js](https://nodejs.org) (ambiente de execução JavaScript).
+Antes de começar, você precisa ter instalado em seu computador:
+* [Git](https://git-scm.com) (programa para baixar códigos do GitHub).
+* [Node.js](https://nodejs.org) (programa necessário para rodar o aplicativo).
 
-### Instruções para Rodar o App
-1. Instale as dependências executando no seu terminal:
+### Passo a Passo para Rodar
+1. Abra o terminal na pasta do projeto e instale os pacotes necessários digitando:
    ```bash
    npm install
    ```
 
-2. Inicie o servidor de desenvolvimento local:
+2. Inicie o aplicativo com o comando:
    ```bash
    npm run dev
    ```
 
-3. Acesse a aplicação no seu navegador através do link padrão:
+3. Abra o seu navegador de internet e entre no link padrão:
    * [http://localhost:3000](http://localhost:3000)
