@@ -8,13 +8,13 @@ export default function Activity() {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
   const { user, turmas, addCoins, coins, completeActivity, logActivityAttempt } = useAppStore();
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showFeedback, setShowFeedback] = useState<null | 'correct' | 'wrong'>(null);
-  
+
   const today = new Date().toISOString().split('T')[0];
   const userTurma = turmas.find(t => t.id === user?.turmaId) || turmas[0];
-  
+
   // Memoize the session activities so the list doesn't change when we mark them as complete
   const categoryActivities = useMemo(() => {
     const raw = userTurma?.activities[category as string] || [];
@@ -24,8 +24,8 @@ export default function Activity() {
   const current = categoryActivities[currentIndex];
 
   if (!current && categoryActivities.length > 0) {
-     navigate('/learn');
-     return null;
+    navigate('/learn');
+    return null;
   }
 
   if (categoryActivities.length === 0) {
@@ -40,20 +40,20 @@ export default function Activity() {
 
   const handleAnswer = (option: string) => {
     if (showFeedback) return;
-    
+
     const isCorrect = option === current.correct;
-    
+
     // Log the answer attempt to Firestore
     logActivityAttempt(current.id, category as string, current.question, option, isCorrect);
-    
+
     if (isCorrect) {
       setShowFeedback('correct');
-      addCoins(5);
-      
+      addCoins(10)
+
       setTimeout(() => {
         // Complete activity and move on after the feedback delay
         completeActivity(current.id);
-        
+
         if (currentIndex < categoryActivities.length - 1) {
           setCurrentIndex(prev => prev + 1);
           setShowFeedback(null);
@@ -115,10 +115,10 @@ export default function Activity() {
                   'bg-art-lime border-art-lime-border text-art-lime-dark',
                   'bg-art-sage border-art-sage-border text-art-sage-dark',
                   'bg-art-peach border-art-peach-border text-art-peach-dark',
-                   'bg-art-rose border-art-rose-border text-art-rose-dark',
+                  'bg-art-rose border-art-rose-border text-art-rose-dark',
                 ];
                 const baseColor = colors[i % colors.length];
-                
+
                 return (
                   <button
                     key={i}
@@ -146,15 +146,15 @@ export default function Activity() {
             exit={{ opacity: 0 }}
             className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 z-20"
           >
-            <motion.div 
-               initial={{ scale: 0, rotate: -45 }}
-               animate={{ scale: 1.2, rotate: 0 }}
-               className="w-48 h-48 bg-art-teal rounded-[48px] flex items-center justify-center shadow-2xl mb-8 border-b-8 border-art-sage-border"
+            <motion.div
+              initial={{ scale: 0, rotate: -45 }}
+              animate={{ scale: 1.2, rotate: 0 }}
+              className="w-48 h-48 bg-art-teal rounded-[48px] flex items-center justify-center shadow-2xl mb-8 border-b-8 border-art-sage-border"
             >
               <Star size={100} className="text-white fill-current animate-pulse" />
             </motion.div>
             <h3 className="text-4xl font-black text-art-navy tracking-tight">MUITO BEM!</h3>
-            <p className="text-2xl font-black text-art-coral">+5 moedas</p>
+            <p className="text-2xl font-black text-art-coral">+10 moedas</p>
           </motion.div>
         )}
       </AnimatePresence>
