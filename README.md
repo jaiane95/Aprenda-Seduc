@@ -1,10 +1,10 @@
-# APRENDA+ — Educação Inclusiva & Gamificada 🌟
+# APRENDA+ — Educação Inclusiva & Gamificada 
 
 O **APRENDA+** é um aplicativo escolar feito para ajudar no aprendizado de crianças de forma amigável, especialmente aquelas com **Autismo (TEA)** e **TDAH**. Ele mistura a organização de uma rotina diária com a diversão de jogos (gamificação), ajudando o aluno a aprender brincando e a se organizar sozinho.
 
 ---
 
-## 💡 A Proposta
+##  A Proposta
 
 O principal objetivo é criar um espaço na internet simples e acolhedor para todo mundo na escola:
 * **Para Alunos:** Menos ansiedade com uma agenda visual bem simples e tarefas coloridas que dão moedas virtuais. Com essas moedas, você pode comprar itens e roupinhas na loja para o seu próprio bonequinho (avatar)!
@@ -13,7 +13,7 @@ O principal objetivo é criar um espaço na internet simples e acolhedor para to
 
 ---
 
-## 🎨 Funcionalidades Principais
+##  Funcionalidades Principais
 
 ### 1. Área do Aluno (Estude Jogando!)
 * **Rotina Visual:** Uma lista de tarefas com cartões coloridos para a criança saber o que vai fazer no dia (evitando preocupação e surpresas).
@@ -34,7 +34,7 @@ O principal objetivo é criar um espaço na internet simples e acolhedor para to
 
 ---
 
-## 🛠️ Tecnologias Usadas
+##  Tecnologias Usadas
 
 O aplicativo foi criado para ser rápido, seguro e muito bonito de usar.
 
@@ -46,7 +46,7 @@ O aplicativo foi criado para ser rápido, seguro e muito bonito de usar.
 
 ---
 
-## 🚀 Como o App foi Desenvolvido
+##  Como o App foi Desenvolvido
 
 O APRENDA+ foi criado com a ajuda de inteligências artificiais avançadas:
 1. **Google AI Studio:** Ajudou a criar perguntas interessantes e a pensar em rotinas saudáveis recomendadas para crianças autistas e com TDAH.
@@ -54,7 +54,7 @@ O APRENDA+ foi criado com a ajuda de inteligências artificiais avançadas:
 
 ---
 
-## 📦 Como Executar o Projeto Localmente
+##  Como Executar o Projeto Localmente
 
 ### Pré-requisitos
 Antes de começar, você precisa ter instalado em seu computador:
