@@ -129,7 +129,9 @@ export default function Login() {
               </motion.button>
             ))}
             {turmas.length === 0 && (
-              <p className="text-slate-400 font-bold py-4">Nenhuma turma adicionada.</p>
+              <p className="text-slate-400 font-bold py-4 flex items-center justify-center gap-2 animate-pulse">
+                Carregando turmas...
+              </p>
             )}
           </div>
         </motion.div>

@@ -150,14 +150,9 @@ export const useAppStore = create<AppState>()(
           users: updatedUsers
         };
       }),
-      turmas: [
-        { id: 'turma-1', name: '1º Ano A', activities: DEFAULT_ACTIVITIES }
-      ],
+      turmas: [],
       setTurmas: (turmas) => set({ turmas }),
-      users: [
-        { uid: 'leo123', name: 'Leo', role: 'student', coins: 12, unlockedItems: [], turmaId: 'turma-1', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Leo', completedActivities: [], pin: '1234' },
-        { uid: 'bia456', name: 'Bia', role: 'student', coins: 5, unlockedItems: [], turmaId: 'turma-1', avatar: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Bia', completedActivities: [], pin: '5678' }
-      ],
+      users: [],
       setUsers: (users) => set({ users }),
       addStudent: (student) => set((state) => ({ users: [...state.users, student] })),
       deleteStudent: (uid) => set((state) => ({ users: state.users.filter(u => u.uid !== uid) })),
@@ -278,6 +273,7 @@ export const useAppStore = create<AppState>()(
     {
       name: 'aprendaplus-storage-v2',
       storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ user: state.user, coins: state.coins }),
     }
   )
 );
